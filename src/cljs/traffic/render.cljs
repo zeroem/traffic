@@ -7,7 +7,7 @@
     (f v ts)
     (close! c)))
 
-(defn start-render-loop [render-fn request-chan]
+(defn start-render-loop! [render-fn request-chan]
   (let [terminator (chan)
         render-fn (frame-renderer render-fn)]
     (go

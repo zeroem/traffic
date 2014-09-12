@@ -1,6 +1,5 @@
-(ns traffic.components
-  (:require [traffic.math :as m]))
+(ns traffic.components)
 
-(defrecord Motion [^m/Direction2D d v a])
-(defrecord Position [^m/Point2D p])
+(defrecord Velocity [d s dv])
+(defrecord Position [x y])
 (defrecord RenderFn [f])

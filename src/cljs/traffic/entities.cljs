@@ -1,13 +1,13 @@
-(ns traffic.entites
+(ns traffic.entities
   (:require [brute.entity :as b]
             [traffic.components :as c]))
 
 
-(defn render-car [color]
-  (fn [e s ctx]
-    (let [p (b/get-component e s c/Position)]
+(defn car-renderer [color]
+  (fn [context s e]
+    (let [p (b/get-component s e c/Position)]
       (aset context "fillStyle" color)
-      (.fillRect context (:x box) (:y box) 5 10))))
+      (.fillRect context (:x p) (:y p) 5 10))))
 
 (defn create-car
   [system opts]
@@ -16,4 +16,4 @@
          (b/add-entity car)
          (b/add-component car (:position opts))
          (b/add-component car (:motion opts))
-         (b/add-component car (c/RenderFn render-car)))))
+         (b/add-component car (c/->RenderFn (car-renderer "red"))))))

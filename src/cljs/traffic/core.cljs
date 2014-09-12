@@ -1,11 +1,17 @@
 (ns traffic.core
   (:require [cljs.core.async :refer [>! <! chan put! close!]]
-            [traffic.render :refer [start-render-loop]])
+            [traffic.render :refer [start-render-loop!]]
+            [traffic.components :as c]
+            [traffic.entities :as e]
+            [traffic.systems :as s]
+            [traffic.math :as m]
+            [brute.entity :as b]
+            [brute.system :as bs])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (enable-console-print!)
 
-(def ac (chan 5))
+(def ac (chan))
 
 (defn timeout [ms]
   (let [c (chan)]
@@ -14,35 +20,40 @@
 
 (defn log [m] (.log js/console (prn-str m)))
 
-(defn render-square [boxes ts]
-  (let [board (.getElementById js/document "board")
-        context (.getContext board "2d")]
-    (.clearRect context 0 0 (.-width board) (.-height board))
-    (dorun (map (fn [box]
-                  (aset context "fillStyle" (:color box))
-                  (.fillRect context (:x box) (:y box) (:size box) (:size box)))
-                boxes))))
+(defn call-render-fn! [context system entity]
+  (let [render-fn (:f (b/get-component system entity c/RenderFn))]
+    (render-fn context system entity)))
+
 
 (defn render-entities [s ts]
-  )
+  (let [board (.getElementById js/document "board")
+        context (.getContext board "2d")
+        renderable (b/get-all-entities-with-component s c/RenderFn)]
+    (.clearRect context 0 0 (.-width board) (.-height board))
+    (dorun (map (partial call-render-fn! context s)
+                renderable))))
 
-(defn rando-square []
-  {:x (rand-int 640)
-   :y (rand-int 480)
-   :size 10
-   :delta (+ 1 (rand-int 4))
-   :color "#F00"})
-
-
-(def stuff (start-render-loop render-square ac))
+(def stuff (start-render-loop! render-entities ac))
 
 
-(defn update-box [b]
-  (assoc b
-    :x (+ (:x b) (- (rand-int 2) (rand-int 2)))
-    :y (+ (:y b) (- (rand-int 2) (rand-int 2)))))
+(def system (-> (b/create-system)
+
+                (e/create-car {:position (c/->Position 20 20)
+                               :motion (c/->Velocity 0 30 2)})
+
+                (e/create-car {:position (c/->Position 50 50)
+                               :motion (c/->Velocity (m/deg->rad 45) 35 0.5)})
+
+                (bs/add-system-fn s/update-physics-system)))
+
+(def step (chan))
 
 #_(go
- (loop [boxes (repeatedly 10 rando-square)]
-   (>! ac boxes)
-   (recur (map update-box boxes))))
+ (loop [system system
+        last-update (.now js/performance)]
+   #_(<! step)
+   (>! ac system)
+   (let [current-update (.now js/performance)]
+     (recur (bs/process-one-game-tick system (- current-update last-update)) current-update))))
+
+#_(put! step :next)

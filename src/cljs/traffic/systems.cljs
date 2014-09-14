@@ -2,16 +2,18 @@
   (:require [brute.entity :as b]
             [traffic.components :as c]))
 
-(defn calculate-motion [m d]
-  (if m
+(defn calculate-velocity [v dv d]
+  (if v
     (let [dt (/ d 1000)]
-    (c/->Velocity (:d m) (+ (:s m)(* dt (:dv m))) (:dv m)))))
+      (c/->Velocity (:d v) (+ (:s v) (* dt dv))))))
 
-(defn update-motion [d s e]
-  (b/update-component s e c/Velocity calculate-motion d))
+(defn update-velocity [d s e]
+  (if-let [a (b/get-component d e c/Acceleration)]
+    (b/update-component s e c/Velocity calculate-velocity (:a a) d))
+  s)
 
-(defn update-motions [s d es]
-  (reduce (partial update-motion d)s es))
+(defn update-velocities [s d es]
+  (reduce (partial update-velocity d)s es))
 
 (defn calculate-position [p m d]
   (if p
@@ -34,5 +36,5 @@
   [system d]
   (let [moving (b/get-all-entities-with-component system c/Velocity)]
      (-> system
-         (update-motions d moving)
+         (update-velocities d moving)
          (update-positions d moving))))

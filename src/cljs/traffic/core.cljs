@@ -2,7 +2,7 @@
   (:require [cljs.core.async :refer [>! <! chan put! close!]]
             [traffic.render :refer [start-render-loop!]]
             [traffic.components :as c]
-            [traffic.components.acceleration :refer [linear]]
+            [traffic.components.acceleration :refer [linear sinusoidal]]
             [traffic.entities :as e]
             [traffic.systems :as s]
             [traffic.math :as m]
@@ -41,7 +41,7 @@
 
                 (e/create-car {:position (c/->Position 20 20)
                                :velocity (c/->Velocity 0 30)
-                               :acceleration (linear 5)})
+                               :acceleration (sinusoidal 0 60)})
 
                 (e/create-car {:position (c/->Position 50 50)
                                :velocity (c/->Velocity (m/deg->rad 45) 35)})

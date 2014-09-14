@@ -17,4 +17,4 @@
                (b/add-component car (c/->RenderFn (car-renderer "red"))))]
      (reduce (fn [s k] (if-let [opt (get opts k)]
                 (b/add-component s car opt)
-                s)) s [:position :motion :acceleration])))
+                s)) s [:position :velocity :acceleration])))

@@ -2,18 +2,17 @@
   (:require [brute.entity :as b]
             [traffic.components :as c]))
 
-(defn calculate-velocity [v dv d]
+(defn calculate-velocity [v f d]
   (if v
-    (let [dt (/ d 1000)]
-      (c/->Velocity (:d v) (+ (:s v) (* dt dv))))))
+    (f v d)))
 
 (defn update-velocity [d s e]
-  (if-let [a (b/get-component d e c/Acceleration)]
-    (b/update-component s e c/Velocity calculate-velocity (:a a) d))
-  s)
+  (if-let [a (b/get-component s e c/Acceleration)]
+    (b/update-component s e c/Velocity calculate-velocity (:f a) d)
+  s))
 
 (defn update-velocities [s d es]
-  (reduce (partial update-velocity d)s es))
+  (reduce (partial update-velocity d) s es))
 
 (defn calculate-position [p m d]
   (if p
@@ -33,7 +32,9 @@
 
 (defn update-physics-system
   "Update Position and Velocity Components"
+
   [system d]
+
   (let [moving (b/get-all-entities-with-component system c/Velocity)]
      (-> system
          (update-velocities d moving)

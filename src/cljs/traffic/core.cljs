@@ -2,6 +2,7 @@
   (:require [cljs.core.async :refer [>! <! chan put! close!]]
             [traffic.render :refer [start-render-loop!]]
             [traffic.components :as c]
+            [traffic.components.acceleration :refer [linear]]
             [traffic.entities :as e]
             [traffic.systems :as s]
             [traffic.math :as m]
@@ -11,7 +12,7 @@
 
 (enable-console-print!)
 
-(def ac (chan 1))
+(def ac (chan 5))
 
 (defn timeout [ms]
   (let [c (chan)]
@@ -39,7 +40,8 @@
 (def system (-> (b/create-system)
 
                 (e/create-car {:position (c/->Position 20 20)
-                               :velocity (c/->Velocity 0 30)})
+                               :velocity (c/->Velocity 0 30)
+                               :acceleration (linear 5)})
 
                 (e/create-car {:position (c/->Position 50 50)
                                :velocity (c/->Velocity (m/deg->rad 45) 35)})
@@ -56,4 +58,4 @@
    (let [current-update (.now js/performance)]
      (recur (bs/process-one-game-tick system (- current-update last-update)) current-update))))
 
-#_(put! step :next)
+(put! step :next)

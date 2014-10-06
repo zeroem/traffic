@@ -4,3 +4,4 @@
 (defn pow [x e] (.pow js/Math x e))
 (def pi (.-PI js/Math))
 (defn deg->rad [deg] (* (/ pi 180) deg))
+(defn sin [r] (.sin js/Math r))

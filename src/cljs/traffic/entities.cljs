@@ -5,7 +5,7 @@
 
 (defn car-renderer [color]
   (fn [context s e]
-    (let [p (b/get-component s e c/Position)]
+    (let [p (b/get-component s e c/Origin)]
       (aset context "fillStyle" color)
       (.fillRect context (:x p) (:y p) 5 10))))
 

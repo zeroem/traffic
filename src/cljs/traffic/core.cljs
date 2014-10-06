@@ -39,11 +39,11 @@
 
 (def system (-> (b/create-system)
 
-                (e/create-car {:position (c/->Position 20 20)
+                (e/create-car {:position (c/->Origin 20 20)
                                :velocity (c/->Velocity 0 30)
                                :acceleration (sinusoidal 0 60)})
 
-                (e/create-car {:position (c/->Position 50 50)
+                (e/create-car {:position (c/->Origin 50 50)
                                :velocity (c/->Velocity (m/deg->rad 45) 35)})
 
                 (bs/add-system-fn s/update-physics-system)))

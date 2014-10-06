@@ -2,5 +2,5 @@
 
 (defrecord Velocity [d s])
 (defrecord Acceleration [f])
-(defrecord Position [x y])
+(defrecord Origin [x y])
 (defrecord RenderFn [f])

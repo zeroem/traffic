@@ -19,11 +19,11 @@
     (let [dt (/ d 1000)
           dx (* dt (:s m) (.cos js/Math (:d m)))
           dy (* dt (:s m) (.sin js/Math (:d m)))]
-      (c/->Position (+ (:x p) dx) (+ (:y p) dy)))))
+      (c/->Origin (+ (:x p) dx) (+ (:y p) dy)))))
 
 (defn update-position [d s e]
   (if-let [m (b/get-component s e c/Velocity)]
-    (b/update-component s e c/Position calculate-position m d)
+    (b/update-component s e c/Origin calculate-position m d)
     s))
 
 
@@ -31,7 +31,7 @@
   (reduce (partial update-position d) s es))
 
 (defn update-physics-system
-  "Update Position and Velocity Components"
+  "Update Origin and Velocity Components"
 
   [system d]
 
